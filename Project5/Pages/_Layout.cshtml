@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="*">
+
+    <title>Project 5</title>
+    <environment include="Development">
+        <link rel="stylesheet" href="https://www.lahava.vn/public/assets/css/style.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://www.lahava.vn/public/assets/css/style.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    </environment>
+</head>
+<body>
+    <div class="block-main">
+        <div class="container">
+
+            <div class="block-headerPage">
+                <h1 class="page-title">Áo dài cưới</h1>
+                <div class="description-page">
+                    <strong>Áo dài cưới 2022</strong> - Là những thiết kế áo dài nhẹ nhàng tinh tế và ấn tượng... luông mang lại cảm giác tự tin cho cô dâu trong ngày trọng đại của mình với những chất liệu mới mẻ và cao cấp đến từ LAHAVA
+                </div>
+            </div>
+            <p class="countProduct">130 KIỂU | <span style="color:#c0392b;">KHÔNG CHO THUÊ</span></p>
+
+            <div class="list-products row">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

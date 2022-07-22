@@ -1,0 +1,106 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Transform": "AWS::Serverless-2016-10-31",
+    "Description": "An AWS Serverless Application that uses the ASP.NET Core framework running in Amazon Lambda.",
+    "Parameters": {},
+    "Conditions": {},
+    "Resources": {
+        "AspNetCoreFunction": {
+            "Type": "AWS::Serverless::Function",
+            "Properties": {
+                "Handler": "Project5::Project5.LambdaEntryPoint::FunctionHandlerAsync",
+                "Runtime": "dotnet6",
+                "CodeUri": "",
+                "MemorySize": 256,
+                "Timeout": 30,
+                "Role": null,
+                "Policies": [
+                    "AWSLambda_FullAccess",
+                    "AmazonS3FullAccess"
+                ],
+                "Events": {
+                    "ProxyResource": {
+                        "Type": "Api",
+                        "Properties": {
+                            "Path": "/{proxy+}",
+                            "Method": "ANY"
+                        }
+                    },
+                    "RootResource": {
+                        "Type": "Api",
+                        "Properties": {
+                            "Path": "/",
+                            "Method": "ANY"
+                        }
+                    }
+                }
+            }
+        },
+        "DynamoDBTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+                "AttributeDefinitions": [
+                    {
+                        "AttributeName": "Id",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "Name",
+                        "AttributeType": "S"
+                    }
+                ],
+                "KeySchema": [
+                    {
+                        "AttributeName": "Id",
+                        "KeyType": "HASH"
+                    },
+                    {
+                        "AttributeName": "Name",
+                        "KeyType": "RANGE"
+                    }
+                ],
+                "TableName": "Production",
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits": 10,
+                    "WriteCapacityUnits": 10
+                }
+            }
+        },
+        "AttachmentsBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "BucketName": "bucket-pro5",
+                "AccessControl": "PublicRead",
+                "CorsConfiguration": {
+                    "CorsRules": [
+                        {
+                            "AllowedHeaders": [
+                                "*"
+                            ],
+                            "AllowedMethods": [
+                                "PUT",
+                                "POST",
+                                "DELETE",
+                                "GET",
+                                "HEAD"
+                            ],
+                            "AllowedOrigins": [
+                                "*"
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+
+            
+    },
+    "Outputs": {
+        "ApiURL": {
+            "Description": "API endpoint URL for Prod environment",
+            "Value": {
+                "Fn::Sub": "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+            }
+        }
+    }
+}
