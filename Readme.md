@@ -130,12 +130,22 @@ Enable Cors
                     "AmazonS3FullAccess"
                 ],
                 "Events": {
+                    "ProxyResource": {
+                        "Type": "Api",
+                        "Properties": {
+                            "Path": "/{proxy+}",
+                            "Method": "ANY",
+                            "RestApiId": {
+                                "Ref": "ApiGatewayApi"
+                            }
+                        }
+                    },
                     "RootResource": {
                         "Type": "Api",
                         "Properties": {
-                            "Path": "/api/production",
+                            "Path": "/",
                             "Method": "ANY",
-                             "RestApiId": {
+                            "RestApiId": {
                                 "Ref": "ApiGatewayApi"
                             }
                         }
@@ -161,8 +171,6 @@ Enable Cors
                     }
                 }
             }
-        },
-
-
+        }
 I setting Enviroment Prod 
-Endpoind: https://s6px12t3qe.execute-api.us-east-1.amazonaws.com/Prod
+Endpoind: https://s6px12t3qe.execute-api.us-east-1.amazonaws.com/Prod/

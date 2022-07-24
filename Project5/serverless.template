@@ -26,12 +26,22 @@
                     "AmazonS3FullAccess"
                 ],
                 "Events": {
+                    "ProxyResource": {
+                        "Type": "Api",
+                        "Properties": {
+                            "Path": "/{proxy+}",
+                            "Method": "ANY",
+                            "RestApiId": {
+                                "Ref": "ApiGatewayApi"
+                            }
+                        }
+                    },
                     "RootResource": {
                         "Type": "Api",
                         "Properties": {
-                            "Path": "/api/production",
+                            "Path": "/",
                             "Method": "ANY",
-                             "RestApiId": {
+                            "RestApiId": {
                                 "Ref": "ApiGatewayApi"
                             }
                         }
