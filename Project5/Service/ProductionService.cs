@@ -4,6 +4,7 @@ using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.DynamoDBv2.Model;
+using Amazon.Lambda.Core;
 using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
@@ -16,7 +17,8 @@ namespace Project5.Service
     public class Productionervice : IProductionService
     {
         private readonly IDynamoDBContext _context;
-        //private readonly IAmazonS3 _s3Client;
+        //private readonly ILambdaContext _log;
+        ////private readonly IAmazonS3 _s3Client;
         public IConfiguration Configuration { get; }
 
         public Productionervice(IDynamoDBContext context, IConfiguration configuration)
@@ -183,32 +185,52 @@ namespace Project5.Service
         /// <param name="keyName"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public async Task<string> UploadFile(string url, string keyName)
+        public async Task<string> UploadFile(IFormFile myfile)
         {
 
             try
             {
-                var credentials = new BasicAWSCredentials("AKIAVQLZ5C7SGH2GFTOQ", "NcW1kf7hfzC+So4h9r3zFfggiedoQ4pFiBXvK6Ly");
-                var client = new AmazonS3Client(credentials, RegionEndpoint.USEast1);
+                //var credentials = new BasicAWSCredentials("AKIAVQLZ5C7SGH2GFTOQ", "NcW1kf7hfzC+So4h9r3zFfggiedoQ4pFiBXvK6Ly");
+                //var client = new AmazonS3Client(credentials, RegionEndpoint.USEast1);
 
-                //var bucketExists = await _s3Client.DoesS3BucketExistAsync(Configuration["AWS:BucketName"]);
-                PutObjectRequest putRequest = new PutObjectRequest
+                ////var bucketExists = await _s3Client.DoesS3BucketExistAsync(Configuration["AWS:BucketName"]);
+                //PutObjectRequest putRequest = new PutObjectRequest
+                //{
+                //    FilePath = url,
+                //    Key = keyName,
+                //    BucketName = Configuration["AWS:BucketName"],
+                //    ContentType = "image/png"
+                //};
+
+                //PutObjectResponse response = await client.PutObjectAsync(putRequest);
+                //GetPreSignedUrlRequest request = new GetPreSignedUrlRequest();
+                //request.BucketName = Configuration["AWS:BucketName"];
+                //request.Key = keyName;
+                //request.Expires = DateTime.Now.AddYears(1);
+                //request.Protocol = Protocol.HTTP;
+                //string urlFinal = client.GetPreSignedURL(request);
+
+                //return urlFinal;
+                var s3Client = new AmazonS3Client("AKIAVQLZ5C7SGH2GFTOQ", "NcW1kf7hfzC+So4h9r3zFfggiedoQ4pFiBXvK6Ly", RegionEndpoint.USEast1);
+                var bucketName = Configuration["AWS:BucketName"];
+                var keyName = myfile.FileName;
+
+                var fs = myfile.OpenReadStream();
+
+                var request = new Amazon.S3.Model.PutObjectRequest
                 {
-                    FilePath = url,
+                    BucketName = bucketName,
                     Key = keyName,
-                    BucketName = Configuration["AWS:BucketName"],
-                    ContentType = "image/png"
+                    InputStream = fs,
+                    ContentType = "image/png",
+                    CannedACL = S3CannedACL.PublicRead,
+                    AutoCloseStream = false,
                 };
+                await s3Client.PutObjectAsync(request);
 
-                PutObjectResponse response = await client.PutObjectAsync(putRequest);
-                GetPreSignedUrlRequest request = new GetPreSignedUrlRequest();
-                request.BucketName = Configuration["AWS:BucketName"];
-                request.Key = keyName;
-                request.Expires = DateTime.Now.AddYears(1);
-                request.Protocol = Protocol.HTTP;
-                string urlFinal = client.GetPreSignedURL(request);
+                return string.Format("http://{0}.s3.amazonaws.com/{1}", bucketName, keyName);
 
-                return urlFinal;
+
             }
             catch (AmazonS3Exception amazonS3Exception)
             {
@@ -221,6 +243,9 @@ namespace Project5.Service
                 }
                 else
                 {
+                    //_log.Logger.LogInformation($"Error getting object {myfile.FileName} from bucket {Configuration["AWS:BucketName"]}. Make sure they exist and your bucket is in the same region as this function.");
+                    //_log.Logger.LogInformation(amazonS3Exception.Message);
+                    //_log.Logger.LogInformation(amazonS3Exception.StackTrace);
                     throw new Exception("Error occurred: " + amazonS3Exception.Message);
                 }
             }

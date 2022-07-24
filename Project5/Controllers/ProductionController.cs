@@ -43,32 +43,31 @@ public class ProductionController : ControllerBase
         return await _productionService.GetAll();
     }
     [HttpPost("UploadFiles")]
-    public async Task<IActionResult> Post(List<IFormFile> files, string Id, string Name)
+    public async Task<IActionResult> Post(IFormFile files, string Id, string Name)
     {
         try
         {
-            long size = files.Sum(f => f.Length);
+            //long size = files.Sum(f => f.Length);
 
-            // full path to file in temp location
-            var filePath = Path.GetTempFileName();
+            //// full path to file in temp location
+            //var filePath = Path.GetTempFileName();
 
-            foreach (var formFile in files)
-            {
-                if (formFile.Length > 0)
-                {
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await formFile.CopyToAsync(stream);
-                    }
-                }
-            }
+            //foreach (var formFile in files)
+            //{
+            //    if (formFile.Length > 0)
+            //    {
+            //        using (var stream = new FileStream(filePath, FileMode.Create))
+            //        {
+            //            await formFile.CopyToAsync(stream);
+            //        }
+            //    }
+            //}
 
             // process uploaded files
             // Don't rely on or trust the FileName property without validation.
-            var filename = Path.GetFileName(filePath) + ".png";
-            var urlS3 = await _productionService.UploadFile(filePath, filename);
+            var urlS3 = await _productionService.UploadFile(files);
             await _productionService.Update(new ProductionDto { Id = Id, Name = Name, Image = urlS3, Price = 0 });
-            return Ok(new { count = files.Count, size, urlS3 });
+            return Ok(new { urlS3 });
         }
         catch (Exception)
         {

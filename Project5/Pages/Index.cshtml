@@ -52,12 +52,12 @@
         font-weight: bold;
     }
 
-    .close:hover,
-    .close:focus {
-        color: #000;
-        text-decoration: none;
-        cursor: pointer;
-    }
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
 
     img {
         height: 300px !important;
@@ -65,132 +65,136 @@
 </style>
 
 <script language="javascript">
-
-    const api_url = "https://cmx8h1haeg.execute-api.us-east-1.amazonaws.com/Prod/api/production";
-    //const api_url = "https://localhost:59161/api/production";
-    
-
-    // Defining async function
-    async function getapi(url) {
-        // Storing response
-        const response = await fetch(url, { mode: 'cors' });
-        var html = "";
-        // Storing data in form of JSON
-        var data = await response.json();
-        for (var i = 0; i < data.length; i++) {
-            html += '     <li class=" col-sm-4  col-xs-12"> ' +
-                '<div class="product-item">' +
-                ' <div class="product-image-area">' +
-                '<img src="' + data[i].image + '" alt="Áo dài cưới trắng cut-out đính kết tinh tế 1">' +
-                ' </div>' +
-                ' <div class="price-box">' +
-                '     <p class="special-price">' +
-                '        <span class="price">' + data[i].price + '&nbsp;₫</span>' +
-                '     </p>' +
-                '<button onclick="DetailPro(' + data[i].id + ')" data-id="' + data[i].id + '"  id="modify-' + data[i].id + '" style="float: right;background: aqua; */padding: 7px;color: black;border: lightgray;">Detail</button>' +
-
-                '  </div>' +
-                '  <p class="product_sku">Mã SP: ' + data[i].id + '</p>' +
-                '  <h2 class="product-name">' +
-                '      <a href="" title="Áo dài cưới trắng cut-out đính kết tinh tế">' + data[i].name + '</a>' +
-                '<button onclick="myFunction(' + data[i].id + ')" data-id="' + data[i].id + '" data-name="' + data[i].name + '" id="delete-' + data[i].id + '"" style="float: right;background:red;width: 25%;padding: 7px;color: white;border: lightgray;" >Delete</button>' +
-                '   </h2>' +
-                ' </div>' +
-                '</li>';
-        }
-        document.getElementById("demo").innerHTML = html;
-    }
-    getapi(api_url);
-    async function myFunction(id) {
-        var buttom = document.querySelector("button#delete-00" + id);
-        var id = buttom.getAttribute("data-id");
-        var name = buttom.getAttribute("data-name");
-        const response = await fetch(api_url + "?Id=" + id + "&Name=" + name + "", { method: 'DELETE' }, { mode: 'cors' });
-        var data = await response.json();
-        if (data == true) {
-            alert('Delete Success!!')
-            getapi(api_url);
-        } else {
-            alert("Can't Delete")
-        }
-    }
-    async function upload(id) {
-        var btn = document.querySelector("button#upload-00" + id);
-        var idform = btn.getAttribute("data-id");
-        var name = btn.getAttribute("data-name");
-        var input = document.getElementById('fileupload');
-        var files = input.files[0];
+            const api_url = "https://localhost:59161/api/production";
 
 
-        var formData = new FormData();
-        formData.append("files", files);
-        formData.append("id", idform);
-        formData.append("name", name);
-        const response = await fetch(api_url + "/UploadFiles", {
-            method: 'post',
-            body: formData,
-        });
-        alert('Sucess upload Image')
-        await DetailPro(id);
-        await getapi(api_url);
+            // Defining async function
+            async function getapi(url) {
+                // Storing response
+                const response = await fetch(url, {
+                    //mode: 'no-cors',
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                var html = "";
+                // Storing data in form of JSON
+                var data = await response.json();
+                for (var i = 0; i < data.length; i++) {
+                    html += '     <li class=" col-sm-4  col-xs-12"> ' +
+                        '<div class="product-item">' +
+                        ' <div class="product-image-area">' +
+                        '<img src="' + data[i].image + '" alt="Áo dài cưới trắng cut-out đính kết tinh tế 1">' +
+                        ' </div>' +
+                        ' <div class="price-box">' +
+                        '     <p class="special-price">' +
+                        '        <span class="price">' + data[i].price + '&nbsp;₫</span>' +
+                        '     </p>' +
+                        '<button onclick="DetailPro(' + data[i].id + ')" data-id="' + data[i].id + '"  id="modify-' + data[i].id + '" style="float: right;background: aqua; */padding: 7px;color: black;border: lightgray;">Detail</button>' +
 
-    }
-
-    async function DetailPro(id) {
-        var btn = document.querySelector("button#modify-00" + id);
-
-        var id = btn.getAttribute("data-id");
-        const response = await fetch(api_url + "/" + id, { method: 'GET' }, { mode: 'cors' });
-        var html = "";
-        // Storing data in form of JSON
-        var data = await response.json();
-        for (var i = 0; i < data.length; i++) {
-            html += '     <li class=" col-sm-4  col-xs-12"> ' +
-                '<div class="product-item">' +
-                ' <div class="product-image-area">' +
-                '<img src="' + data[i].image + '" alt="Áo dài cưới trắng cut-out đính kết tinh tế 1">' +
-                ' </div>' +
-                ' <div class="price-box">' +
-                '     <p class="special-price">' +
-                '        <span class="price">' + data[i].price + '&nbsp;₫</span>' +
-                '     </p>' +
-                '  </div>' +
-                '  <p class="product_sku">Mã SP: ' + data[i].id + '</p>' +
-                '  <h2 class="product-name">' +
-                '      <a href="" title="Áo dài cưới trắng cut-out đính kết tinh tế">' + data[i].name + '</a>' +
-                '   </h2>' +
-                ' </div>' +
-                '</li>' +
-                '<li class=" col-sm-4 col-xs-12">' +
-                '<input type="file" id="fileupload" multiple name="files">' +
-                '<button onclick="upload(' + data[i].id + ')" data-id="' + data[i].id + '" data-name="' + data[i].name + '" id="upload-' + data[i].id + '"" style="float: right;background:blue;width: 25%;padding: 7px;color: white;border: lightgray;" >Upload</button>' +
-                '</li>';
-        }
-
-
-        document.getElementById("content-detail").innerHTML = html;
-        var modal = document.getElementById("myModal");
-
-        // Get the button that opens the modal
-
-        // Get the <span> element that closes the modal
-        var span = document.getElementsByClassName("close")[0];
-
-        // When the user clicks the button, open the modal
-        btn.onclick = function() {
-            modal.style.display = "block";
-        }
-
-        // When the user clicks on <span> (x), close the modal
-        span.onclick = function() {
-            modal.style.display = "none";
-        }
-
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
+                        '  </div>' +
+                        '  <p class="product_sku">Mã SP: ' + data[i].id + '</p>' +
+                        '  <h2 class="product-name">' +
+                        '      <a href="" title="Áo dài cưới trắng cut-out đính kết tinh tế">' + data[i].name + '</a>' +
+                        '<button onclick="myFunction(' + data[i].id + ')" data-id="' + data[i].id + '" data-name="' + data[i].name + '" id="delete-' + data[i].id + '"" style="float: right;background:red;width: 25%;padding: 7px;color: white;border: lightgray;" >Delete</button>' +
+                        '   </h2>' +
+                        ' </div>' +
+                        '</li>';
+                }
+                document.getElementById("demo").innerHTML = html;
             }
-        }
-    }
+            getapi(api_url);
+            async function myFunction(id) {
+                var buttom = document.querySelector("button#delete-00" + id);
+                var id = buttom.getAttribute("data-id");
+                var name = buttom.getAttribute("data-name");
+                const response = await fetch(api_url + "?Id=" + id + "&Name=" + name + "", { method: 'DELETE' }, { mode: 'cors' });
+                var data = await response.json();
+                if (data == true) {
+                    alert('Delete Success!!')
+                    getapi(api_url);
+                } else {
+                    alert("Can't Delete")
+                }
+            }
+            async function upload(id) {
+                var btn = document.querySelector("button#upload-00" + id);
+                var idform = btn.getAttribute("data-id");
+                var name = btn.getAttribute("data-name");
+                var input = document.getElementById('fileupload');
+                var files = input.files[0];
+
+
+                var formData = new FormData();
+                formData.append("files", files);
+                formData.append("id", idform);
+                formData.append("name", name);
+                const response = await fetch(api_url + "/UploadFiles", {
+                    method: 'post',
+                    body: formData,
+                });
+                alert('Sucess upload Image')
+                await DetailPro(id);
+                await getapi(api_url);
+
+            }
+
+            async function DetailPro(id) {
+                var btn = document.querySelector("button#modify-00" + id);
+
+                var id = btn.getAttribute("data-id");
+                const response = await fetch(api_url + "/" + id, { method: 'GET' }, { mode: 'cors' });
+                var html = "";
+                // Storing data in form of JSON
+                var data = await response.json();
+                for (var i = 0; i < data.length; i++) {
+                    html += '     <li class=" col-sm-4  col-xs-12"> ' +
+                        '<div class="product-item">' +
+                        ' <div class="product-image-area">' +
+                        '<img src="' + data[i].image + '" alt="Áo dài cưới trắng cut-out đính kết tinh tế 1">' +
+                        ' </div>' +
+                        ' <div class="price-box">' +
+                        '     <p class="special-price">' +
+                        '        <span class="price">' + data[i].price + '&nbsp;₫</span>' +
+                        '     </p>' +
+                        '  </div>' +
+                        '  <p class="product_sku">Mã SP: ' + data[i].id + '</p>' +
+                        '  <h2 class="product-name">' +
+                        '      <a href="" title="Áo dài cưới trắng cut-out đính kết tinh tế">' + data[i].name + '</a>' +
+                        '   </h2>' +
+                        ' </div>' +
+                        '</li>' +
+                        '<li class=" col-sm-4 col-xs-12">' +
+                        '<input type="file" id="fileupload" multiple name="files">' +
+                        '<button onclick="upload(' + data[i].id + ')" data-id="' + data[i].id + '" data-name="' + data[i].name + '" id="upload-' + data[i].id + '"" style="float: right;background:blue;width: 25%;padding: 7px;color: white;border: lightgray;" >Upload</button>' +
+                        '</li>';
+                }
+
+
+                document.getElementById("content-detail").innerHTML = html;
+                var modal = document.getElementById("myModal");
+
+                // Get the button that opens the modal
+
+                // Get the <span> element that closes the modal
+                var span = document.getElementsByClassName("close")[0];
+
+                // When the user clicks the button, open the modal
+                btn.onclick = function() {
+                    modal.style.display = "block";
+                }
+
+                // When the user clicks on <span> (x), close the modal
+                span.onclick = function() {
+                    modal.style.display = "none";
+                }
+
+                // When the user clicks anywhere outside of the modal, close it
+                window.onclick = function(event) {
+                    if (event.target == modal) {
+                        modal.style.display = "none";
+                    }
+                }
+            }
 </script>

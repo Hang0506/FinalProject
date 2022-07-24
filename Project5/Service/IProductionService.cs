@@ -10,6 +10,6 @@ namespace Project5.Service
         Task<bool> Update(ProductionDto request);
         Task<bool> Delete(DeteleDto request);
         Task<IEnumerable<Production>> GetAll();
-        Task<string> UploadFile(string url, string keyName);
+        Task<string> UploadFile(IFormFile myfile);
     }
 }

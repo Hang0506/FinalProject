@@ -5,6 +5,13 @@
     "Parameters": {},
     "Conditions": {},
     "Resources": {
+        "ApiGatewayApi": {
+            "Type": "AWS::Serverless::Api",
+            "Properties": {
+                "StageName": "Prod",
+                "Cors": "'https://localhost:59161,https://localhost:59161;http://localhost:59162'"
+            }
+        },
         "AspNetCoreFunction": {
             "Type": "AWS::Serverless::Function",
             "Properties": {
@@ -19,19 +26,34 @@
                     "AmazonS3FullAccess"
                 ],
                 "Events": {
-                    "ProxyResource": {
-                        "Type": "Api",
-                        "Properties": {
-                            "Path": "/{proxy+}",
-                            "Method": "ANY"
-                        }
-                    },
                     "RootResource": {
                         "Type": "Api",
                         "Properties": {
-                            "Path": "/",
-                            "Method": "ANY"
+                            "Path": "/api/production",
+                            "Method": "ANY",
+                             "RestApiId": {
+                                "Ref": "ApiGatewayApi"
+                            }
                         }
+                    }
+                },
+                "FunctionUrlConfig": {
+                    "AuthType": "NONE",
+                    "Cors": {
+                        "AllowCredentials": true,
+                        "AllowMethods": [
+                            "PUT",
+                            "POST",
+                            "DELETE",
+                            "GET",
+                            "HEAD"
+                        ],
+                        "AllowOrigins": [
+                            "*"
+                        ],
+                        "AllowHeaders": [
+                            "*"
+                        ]
                     }
                 }
             }
@@ -91,15 +113,23 @@
                     ]
                 }
             }
-        }
-
-            
-    },
-    "Outputs": {
-        "ApiURL": {
-            "Description": "API endpoint URL for Prod environment",
-            "Value": {
-                "Fn::Sub": "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+        },
+        "BucketPolicy": {
+            "Type": "AWS::S3::BucketPolicy",
+            "Properties": {
+                "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": {
+                        "Sid": "PublicReadForGetBucketObjects",
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": "*",
+                        "Resource": "arn:aws:s3:::bucket-pro5/*"
+                    }
+                },
+                "Bucket": {
+                    "Ref": "AttachmentsBucket"
+                }
             }
         }
     }
